@@ -1,13 +1,20 @@
 
 pipeline {
     agent { label 'docker' }
+      
 
-      stages {
+    parameters {
+        string(name: 'FRONTEND_PORT', defaultValue: '3000', description: 'Frontend Port')
+        string(name: 'BACKEND_PORT', defaultValue: '5000', description: 'Backend Port')
+    }
 
-        stage('Stop Containers') {
-            steps {
-                sh 'sudo docker-compose down'
-            }
+	
+    stages {
+
+       stage('Stop Containers') {
+           steps {
+               sh 'sudo docker-compose down'
+           }
         }
 
         stage('Build and Start Containers') {
