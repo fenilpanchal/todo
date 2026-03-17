@@ -4,7 +4,7 @@ pipeline {
 
     parameters {
         string(name: 'FRONTEND_PORT', defaultValue: '3000', description: 'Frontend Port')
-        string(name: 'BACKEND_PORT', defaultValue: '8080', description: 'Backend Port')
+        string(name: 'BACKEND_PORT', defaultValue: '5000', description: 'Backend Port')
     }
 
     stages {
