@@ -19,17 +19,16 @@ pipeline {
 
         stage('Build and Start Containers') {
     	
-            steps {
-        	sh """
-        	BACKEND_PORT=${params.BACKEND_PORT} \
-        	FRONTEND_PORT=${params.FRONTEND_PORT} \
-        	sudo docker-compose up -d --build
+           steps {
+               sh """
+               BACKEND_PORT=${params.BACKEND_PORT} \
+               FRONTEND_PORT=${params.FRONTEND_PORT} \
+               sudo docker-compose up -d --build
         	"""
             }
 
         } 
 
-    } 
-    
+     }  
 }
 
