@@ -30,9 +30,9 @@ services:
     restart: always
 
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "${BACKEND_PORT}:5000"
     environment:
-      PORT: ${BACKEND_PORT}
+      # PORT: ${BACKEND_PORT}
       DB_HOST: db
       DB_USER: root
       DB_PASSWORD: password
@@ -46,7 +46,7 @@ services:
       - todo-network
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://20.20.1.166:${BACKEND_PORT}/health"]
+      test: ["CMD", "wget", "--spider", "http://20.20.1.166:5000 health"]
       interval: 20s
       timeout: 10s
       retries: 3
