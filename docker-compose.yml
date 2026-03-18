@@ -30,7 +30,7 @@ services:
     restart: always
 
     ports:
-      - "${BACKEND_PORT}:5000"
+      - "${BACKEND_PORT}:{BACKEND_PORT}"
 
     environment:
       DB_HOST: db
