@@ -65,7 +65,7 @@ services:
       - todo-network
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://20.20.1.166"]
+      test: ["CMD", "wget", "--spider", "http://20.20.1.166:${FRONTEND_PORT}"]
       interval: 30s
       timeout: 10s
       retries: 3
