@@ -8,28 +8,23 @@ pipeline {
     }
 
     stages {
-
-        stage('Create .env File') {
-            steps {
-                sh """
-                    echo "BACKEND_PORT=${params.BACKEND_PORT}" > .env
-                    echo "FRONTEND_PORT=${params.FRONTEND_PORT}" >> .env
-                """
-            }
-        }
-
         stage('Stop Old Containers') {
             steps {
                 sh 'docker-compose down'
             }
         }
 
-        stage('Build and Start Containers') {
-            steps {
-                sh 'docker-compose up -d --build'
+	stage('Build and Start Containers') {
+    	    steps {
+        	sh """
+        	BACKEND_PORT=${params.BACKEND_PORT} \
+        	FRONTEND_PORT=${params.FRONTEND_PORT} \
+        	docker-compose up -d --build
+        	"""
             }
+
         }
 
-    }
-}
+     }
 
+}
