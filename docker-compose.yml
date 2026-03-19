@@ -35,7 +35,8 @@ services:
         # env_file:
         # - .env 
 
-    environment: 
+    environment:
+      REACT_APP_API_URL: "http://20.20.1.166:${BACKEND_PORT}"
       DB_HOST: db
       DB_USER: root
       DB_PASSWORD: password
