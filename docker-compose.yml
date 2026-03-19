@@ -29,14 +29,13 @@ services:
     container_name: todo-backend
     restart: always
    
-      # ports:
-      # - "${BACKEND_PORT}:5000"
+       ports:
+         - "${BACKEND_PORT}:5000"
 
         # env_file:
         # - .env 
 
     environment:
-      REACT_APP_API_URL: "http://20.20.1.166:${BACKEND_PORT}"
       DB_HOST: db
       DB_USER: root
       DB_PASSWORD: password
