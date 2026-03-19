@@ -46,7 +46,7 @@ services:
       - todo-network
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:5000/health"]
+      test: ["CMD", "wget", "--spider", "http://localhost:${BACKEND_PORT}/health"]
       interval: 20s
       timeout: 10s
       retries: 3
