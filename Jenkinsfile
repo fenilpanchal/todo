@@ -19,7 +19,7 @@ pipeline {
         	sh """
         	export BACKEND_PORT=${params.BACKEND_PORT} 
         	export FRONTEND_PORT=${params.FRONTEND_PORT} 
-        	docker-compose up -d --build
+        	docker-compose -env--file .env up -d --build
         	"""
             }
 
