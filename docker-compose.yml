@@ -32,10 +32,11 @@ services:
     ports:
       - "${BACKEND_PORT}:5000"
 
-    env_file:
-      - .env 
+        # env_file:
+        # - .env 
 
     environment: 
+      POART: 5000
       DB_HOST: db
       DB_USER: root
       DB_PASSWORD: password
