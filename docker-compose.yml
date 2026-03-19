@@ -19,7 +19,7 @@ services:
       - todo-network
 
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "20.20.1.166"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "db"]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -50,7 +50,7 @@ services:
       - todo-network
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://20.20.1.166:5000/health"]
+      test: ["CMD", "wget", "--spider", "http://backend/health"]
       interval: 20s
       timeout: 10s
       retries: 3
@@ -70,7 +70,7 @@ services:
       - todo-network
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://20.20.1.166"]
+      test: ["CMD", "wget", "--spider", "http://frontend"]
       interval: 30s
       timeout: 10s
       retries: 3
