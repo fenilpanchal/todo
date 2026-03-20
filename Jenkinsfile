@@ -1,4 +1,3 @@
-
 pipeline {
     agent { label 'docker' }
 
@@ -20,28 +19,32 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: "${params.BRANCH_NAME.split('/').last()}",
-                    url: 'https://github.com/fenilpanchal/todo.git' 
+                    url: 'https://github.com/fenilpanchal/todo.git'
+            }
+        }
+
+        // ✅ THIS IS WHAT YOU WANT
+        stage('Create .env File') {
+            steps {
+                sh """
+                echo "FRONTEND_PORT=${params.FRONTEND_PORT}" > .env
+                echo "BACKEND_PORT=${params.BACKEND_PORT}" >> .env
+                """
             }
         }
 
         stage('Stop Old Containers') {
             steps {
-                sh 'docker-compose down'
+                sh 'docker-compose down || true'
             }
         }
 
         stage('Build and Start Containers') {
             steps {
-                sh """                
-                export FRONTEND_PORT=${params.FRONTEND_PORT}
-                export BACKEND_PORT=${params.BACKEND_PORT}
-
+                sh """
                 docker-compose --env-file .env up -d --build
                 """
             }
         }
-
     }
 }
-
-
