@@ -20,7 +20,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: "${params.BRANCH_NAME.split('/').last()}",
-                    url: 'https://github.com/fenilpanchal/todo', branch: ${params.BRANCH_NAME.split('/').last()} 
+                    url: 'https://github.com/fenilpanchal/todo', branch: "${params.BRANCH_NAME.split('/').last()}" 
             }
         }
 
