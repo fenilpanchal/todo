@@ -6,7 +6,7 @@ pipeline {
     environment {
         VM_IP     = "20.20.1.166"
         VM_USER   = "zymr"
-        APP_DIR   = "/home/zymr/"
+        APP_DIR   = "/home/zymr/opt"
         REPO_URL  = "https://github.com/fenilpanchal/todo.git"
         BRANCH    = "main"
     }
