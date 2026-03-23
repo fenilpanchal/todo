@@ -23,15 +23,6 @@ pipeline {
             }
         }
 
-        // ✅ THIS IS WHAT YOU WANT
-        stage('Create .env File') {
-            steps {
-                sh """
-                echo "FRONTEND_PORT=${params.FRONTEND_PORT}" > .env
-                echo "BACKEND_PORT=${params.BACKEND_PORT}" >> .env
-                """
-            }
-        }
 
         stage('Stop Old Containers') {
             steps {
