@@ -20,12 +20,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_IP} '
 
 
-                        if [ ! -d "${APP_DIR}/.git" ]; then
-                            echo "Repo not found → Cloning..."
                             git clone -b ${BRANCH} ${REPO_URL} ${APP_DIR}
-                        else
-                            echo "Repo already exists → Skipping clone"
-                        fi
 
                         cd ${APP_DIR}
 
