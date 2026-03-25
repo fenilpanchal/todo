@@ -26,7 +26,7 @@ services:
 
   backend:
     image: 123fenil/todo-app-backend:v2
-    build: ./backend
+      # build: ./backend
     container_name: todo-backend-1
     restart: always
    
@@ -56,8 +56,8 @@ services:
       retries: 3
 
   frontend:
-    image: 123fenil/todo-app-frontend:v3
-    build: ./frontend
+    image: 123fenil/todo-app-frontend:v2
+      # build: ./frontend
     container_name: todo-frontend-1
     restart: always
 
