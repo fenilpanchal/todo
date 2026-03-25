@@ -60,8 +60,8 @@ pipeline {
             steps {
                 sh """
                 ssh ${params.REMOTE_USER}@${params.REMOTE_HOST} '
-                    docker pull 123fenil/todo-app-frontend:v3
-                    docker pull 123fenil/todo-app-backend:v3
+                    docker pull 123fenil/todo-app-frontend:v2
+                    docker pull 123fenil/todo-app-backend:v2
                 '
                 """
             }
