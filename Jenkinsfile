@@ -1,20 +1,11 @@
 
 
 pipeline {
-    agent { label 'docker' }
+    agent { label 'docker' }   
 
     parameters {
         string(name: 'BRANCH', defaultValue: 'main', description: 'Git Branch')
 
-        // 🔹 Frontend
-        string(name: 'FRONTEND_IMAGE', defaultValue: 'yourdockerhub/frontend', description: 'Frontend Image')
-        string(name: 'FRONTEND_TAG', defaultValue: 'latest', description: 'Frontend Tag')
-
-        // 🔹 Backend
-        string(name: 'BACKEND_IMAGE', defaultValue: 'yourdockerhub/backend', description: 'Backend Image')
-        string(name: 'BACKEND_TAG', defaultValue: 'latest', description: 'Backend Tag')
-
-        // 🔹 Remote
         string(name: 'REMOTE_HOST', defaultValue: '192.168.1.10', description: 'Remote Server IP')
         string(name: 'REMOTE_USER', defaultValue: 'test2', description: 'Remote Username')
         string(name: 'REMOTE_DIR', defaultValue: '/home/test2/app', description: 'Deployment Directory')
@@ -26,18 +17,16 @@ pipeline {
         stage('Fetch Parameters') {
             steps {
                 echo "Branch: ${params.BRANCH}"
-                echo "Frontend: ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}"
-                echo "Backend: ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}"
                 echo "Deploying to: ${params.REMOTE_USER}@${params.REMOTE_HOST}"
             }
         }
 
-        // 🔹 2. Clone (avoid re-clone issue)
+        // 🔹 2. Clone Repository (Local user: test / agent)
         stage('Clone Repository') {
             steps {
                 script {
                     if (!fileExists('.git')) {
-                        git branch: "${params.BRANCH}", url: "https://github.com/your-username/your-repo.git"
+                        git branch: "${params.BRANCH}", url: "https://github.com/fenilpanchal/todo.git"
                     } else {
                         sh "git fetch --all"
                         sh "git checkout ${params.BRANCH}"
@@ -47,31 +36,7 @@ pipeline {
             }
         }
 
-        // 🔹 3. Build Images
-        stage('Build Docker Images') {
-            steps {
-                sh """
-                docker build -t ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG} ./frontend
-                docker build -t ${params.BACKEND_IMAGE}:${params.BACKEND_TAG} ./backend
-                """
-            }
-        }
-
-        // 🔹 4. Push Images
-        stage('Push to DockerHub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: '77', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh """
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-
-                    docker push ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}
-                    docker push ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}
-                    """
-                }
-            }
-        }
-
-        // 🔹 5. Prepare Remote
+        // 🔹 3. Prepare Remote Directory
         stage('Prepare Remote Server') {
             steps {
                 sh """
@@ -80,7 +45,7 @@ pipeline {
             }
         }
 
-        // 🔹 6. Transfer Files
+        // 🔹 4. Copy Files (docker-compose + database)
         stage('Transfer Files') {
             steps {
                 sh """
@@ -90,16 +55,24 @@ pipeline {
             }
         }
 
-        // 🔹 7. Deploy
-        stage('Deploy Application') {
+        // 🔹 5. Pull Docker Images on Remote
+        stage('Pull Docker Images') {
+            steps {
+                sh """
+                ssh ${params.REMOTE_USER}@${params.REMOTE_HOST} '
+                    docker pull 123fenil/todo-app-frontend:v3
+                    docker pull 123fenil/todo-app-backend:v3
+                '
+                """
+            }
+        }
+
+        // 🔹 6. Deploy Application
+        stage('Run Docker Compose') {
             steps {
                 sh """
                 ssh ${params.REMOTE_USER}@${params.REMOTE_HOST} '
                     cd ${params.REMOTE_DIR}
-
-                    docker pull ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}
-                    docker pull ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}
-                  
 
                     docker-compose down || true
                     docker-compose up -d
@@ -118,5 +91,4 @@ pipeline {
         }
     }
 }
-
 
