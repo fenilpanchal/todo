@@ -50,6 +50,7 @@ pipeline {
             steps {
                 sh """
                 scp docker-compose.yml ${params.REMOTE_USER}@${params.REMOTE_HOST}:${params.REMOTE_DIR}/
+                scp .env ${params.REMOTE_USER}@${params.REMOTE_HOST}:${params.REMOTE_DIR}/
                 scp -r database ${params.REMOTE_USER}@${params.REMOTE_HOST}:${params.REMOTE_DIR}/
                 """
             }
