@@ -13,7 +13,6 @@ pipeline {
 
     stages {
 
-        // 🔹 1. Show Parameters
         stage('Fetch Parameters') {
             steps {
                 echo "Branch: ${params.BRANCH}"
@@ -21,7 +20,6 @@ pipeline {
             }
         }
 
-        // 🔹 2. Clone Repository (Local user: test / agent)
         stage('Clone Repository') {
             steps {
                 script {
@@ -36,7 +34,6 @@ pipeline {
             }
         }
 
-        // 🔹 3. Prepare Remote Directory
         stage('Prepare Remote Server') {
             steps {
                 sh """
@@ -45,7 +42,6 @@ pipeline {
             }
         }
 
-        // 🔹 4. Copy Files (docker-compose + database)
         stage('Transfer Files') {
             steps {
                 sh """
@@ -56,7 +52,6 @@ pipeline {
             }
         }
 
-        // 🔹 5. Pull Docker Images on Remote
         stage('Pull Docker Images') {
             steps {
                 sh """
@@ -68,7 +63,6 @@ pipeline {
             }
         }
 
-        // 🔹 6. Deploy Application
         stage('Run Docker Compose') {
             steps {
                 sh """
@@ -83,13 +77,5 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            echo "✅ Deployment Successful!"
-        }
-        failure {
-            echo "❌ Deployment Failed!"
-        }
-    }
 }
 
