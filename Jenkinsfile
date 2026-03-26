@@ -27,11 +27,12 @@ pipeline {
             }
         }
 
-        stage('Clone Repository') {
+	stage('Clone Repository') {
             steps {
-                sh ' git clone https://github.com/fenilpanchal/todo.git'
+                git branch: "${params.BRANCH}", url: "https://github.com/fenilpanchal/todo.git"
             }
         }
+
 
         stage('Build Docker Images') {
             steps {
