@@ -13,10 +13,10 @@ pipeline {
         )
 
         string(name: 'FRONTEND_IMAGE', defaultValue: '', description: 'Frontend Image')
-        string(name: 'FRONTEND_TAG', defaultValue: '', description: 'Frontend Tag')
+       
 
         string(name: 'BACKEND_IMAGE', defaultValue: '', description: 'Backend Image')
-        string(name: 'BACKEND_TAG', defaultValue: '', description: 'Backend Tag')
+        
 
         string(name: 'REMOTE_HOST', defaultValue: '', description: 'Remote Server IP')
         string(name: 'REMOTE_USER', defaultValue: '', description: 'Remote Username')
@@ -28,8 +28,8 @@ pipeline {
         stage('Fetch Parameters') {
             steps {
                 echo "Branch: ${params.BRANCH_NAME}"
-                echo "Frontend: ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}"
-                echo "Backend: ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}"
+                echo "Frontend: ${params.FRONTEND_IMAGE}:${params.IMAGE_TAG}"
+                echo "Backend: ${params.BACKEND_IMAGE}:${params.IMAGE_TAG}"
             }
         }
 
@@ -54,8 +54,8 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 sh """
-                docker build -t ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG} ./frontend
-                docker build -t ${params.BACKEND_IMAGE}:${params.BACKEND_TAG} ./backend
+                docker build -t ${params.FRONTEND_IMAGE}:${params.IMAGE_TAG} ./frontend
+                docker build -t ${params.BACKEND_IMAGE}:${params.IMAGE_TAG} ./backend
                 """
             }
         }
@@ -65,8 +65,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: '77', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
                     echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
-                    docker push ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}
-                    docker push ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}
+                    docker push ${params.FRONTEND_IMAGE}:${params.IMAGE_TAG}
+                    docker push ${params.BACKEND_IMAGE}:${params.IMAGE_TAG}
                     """
                 }
             }
@@ -101,8 +101,8 @@ pipeline {
                 sh """
                 ssh ${params.REMOTE_USER}@${params.REMOTE_HOST} "
                     cd ${params.REMOTE_DIR} &&
-                    docker pull ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG} &&
-                    docker pull ${params.BACKEND_IMAGE}:${params.BACKEND_TAG} &&
+                    docker pull ${params.FRONTEND_IMAGE}:${params.IMAGE_TAG} &&
+                    docker pull ${params.BACKEND_IMAGE}:${params.IMAGE_TAG} &&
                     docker-compose up -d --build &&
                     docker image prune -f
                 "
