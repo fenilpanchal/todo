@@ -29,7 +29,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git branch: "${params.BRANCH}", url: "https://github.com/fenilpanchal/todo.git"
+                sh ' git clone https://github.com/fenilpanchal/todo.git'
             }
         }
 
@@ -96,13 +96,5 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            echo " Deployment Successful!"
-        }
-        failure {
-            echo " Deployment Failed!"
-        }
-    }
 }
 
