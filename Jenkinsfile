@@ -74,6 +74,7 @@ pipeline {
         	cd ${REMOTE_DIR} &&
       	        tar -xzvf app.tar.gz &&
        		rm app.tar.gz
+		"
                 """
             }
         }
