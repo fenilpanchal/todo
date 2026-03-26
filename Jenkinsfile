@@ -3,8 +3,15 @@ pipeline {
     agent { label 'docker' }
 
     parameters {
-        string(name: 'BRANCH', defaultValue: ' ', description: 'Git Branch')
+        gitParameter(
+	    name: 'BRANCH_NAME'
+            type: 'PT_BRANCH',
+            defaultValue: 'main',
+            description: 'Select Git Branch',
+            branchFilter: '.*'
+       	)
 
+        
         string(name: 'FRONTEND_IMAGE', defaultValue: ' ', description: 'Frontend Image')
         string(name: 'FRONTEND_TAG', defaultValue: ' ', description: 'Frontend Tag')
 
@@ -20,7 +27,7 @@ pipeline {
 
         stage('Fetch Parameters') {
             steps {
-                echo "Branch: ${params.BRANCH}"
+                echo "Branch: ${params.BRANCH_NAME}"
                 echo "Frontend: ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}"
                 echo "Backend: ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}"
                 echo "Deploying to: ${params.REMOTE_USER}@${params.REMOTE_HOST}"
@@ -29,7 +36,7 @@ pipeline {
 
 	stage('Clone Repository') {
             steps {
-                git branch: "${params.BRANCH}", url: "https://github.com/fenilpanchal/todo.git"
+                git branch: "${params.BRANCH_NAME}", url: "https://github.com/fenilpanchal/todo.git"
             }
         }
 
