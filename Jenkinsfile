@@ -1,26 +1,26 @@
 
+
 pipeline {
     agent { label 'docker' }
 
     parameters {
         gitParameter(
-	    name: 'BRANCH_NAME'
+            name: 'BRANCH_NAME',
             type: 'PT_BRANCH',
             defaultValue: 'main',
             description: 'Select Git Branch',
             branchFilter: '.*'
-       	)
+        )
 
-        
-        string(name: 'FRONTEND_IMAGE', defaultValue: ' ', description: 'Frontend Image')
-        string(name: 'FRONTEND_TAG', defaultValue: ' ', description: 'Frontend Tag')
+        string(name: 'FRONTEND_IMAGE', defaultValue: '', description: 'Frontend Image')
+        string(name: 'FRONTEND_TAG', defaultValue: '', description: 'Frontend Tag')
 
-        string(name: 'BACKEND_IMAGE', defaultValue: ' ', description: 'Backend Image')
-        string(name: 'BACKEND_TAG', defaultValue: ' ', description: 'Backend Tag')
+        string(name: 'BACKEND_IMAGE', defaultValue: '', description: 'Backend Image')
+        string(name: 'BACKEND_TAG', defaultValue: '', description: 'Backend Tag')
 
-        string(name: 'REMOTE_HOST', defaultValue: ' ', description: 'Remote Server IP')
-        string(name: 'REMOTE_USER', defaultValue: ' ', description: 'Remote Username')
-        string(name: 'REMOTE_DIR', defaultValue: ' ', description: 'Deployment Directory')
+        string(name: 'REMOTE_HOST', defaultValue: '', description: 'Remote Server IP')
+        string(name: 'REMOTE_USER', defaultValue: '', description: 'Remote Username')
+        string(name: 'REMOTE_DIR', defaultValue: '', description: 'Deployment Directory')
     }
 
     stages {
@@ -30,16 +30,15 @@ pipeline {
                 echo "Branch: ${params.BRANCH_NAME}"
                 echo "Frontend: ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}"
                 echo "Backend: ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}"
-                echo "Deploying to: ${params.REMOTE_USER}@${params.REMOTE_HOST}"
             }
         }
 
-	stage('Clone Repository') {
+        stage('Clone Repository') {
             steps {
-                git branch: "${params.BRANCH_NAME}", url: "https://github.com/fenilpanchal/todo.git"
+                git branch: "${params.BRANCH_NAME}",
+                    url: "https://github.com/fenilpanchal/todo.git"
             }
         }
-
 
         stage('Build Docker Images') {
             steps {
@@ -54,8 +53,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: '77', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-
+                    echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
                     docker push ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}
                     docker push ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}
                     """
@@ -74,15 +72,15 @@ pipeline {
         stage('Transfer Files') {
             steps {
                 sh """
-        	tar -czvf app.tar.gz docker-compose.yml .env database
+                tar -czvf app.tar.gz docker-compose.yml .env database
 
-               	scp app.tar.gz ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/
+                scp app.tar.gz ${params.REMOTE_USER}@${params.REMOTE_HOST}:${params.REMOTE_DIR}/
 
-     		ssh ${REMOTE_USER}@${REMOTE_HOST} "
-        	cd ${REMOTE_DIR} &&
-      	        tar -xzvf app.tar.gz &&
-       		rm app.tar.gz
-		"
+                ssh ${params.REMOTE_USER}@${params.REMOTE_HOST} "
+                    cd ${params.REMOTE_DIR} &&
+                    tar -xzvf app.tar.gz &&
+                    rm app.tar.gz
+                "
                 """
             }
         }
@@ -90,20 +88,17 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sh """
-                ssh ${params.REMOTE_USER}@${params.REMOTE_HOST} '
-                    cd ${params.REMOTE_DIR}
-
-                    docker pull ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG}
-                    docker pull ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}
-                  
-
-                    docker-compose up -d --build
- 		    docker image prune -f 
-                '
+                ssh ${params.REMOTE_USER}@${params.REMOTE_HOST} "
+                    cd ${params.REMOTE_DIR} &&
+                    docker pull ${params.FRONTEND_IMAGE}:${params.FRONTEND_TAG} &&
+                    docker pull ${params.BACKEND_IMAGE}:${params.BACKEND_TAG} &&
+                    docker-compose up -d --build &&
+                    docker image prune -f
+                "
                 """
             }
         }
     }
-
 }
+
 
