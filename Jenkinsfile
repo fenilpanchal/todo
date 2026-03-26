@@ -3,25 +3,21 @@ pipeline {
     agent { label 'docker' }
 
     parameters {
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Git Branch')
+        string(name: 'BRANCH', defaultValue: ' ', description: 'Git Branch')
 
-        // 🔹 Frontend
-        string(name: 'FRONTEND_IMAGE', defaultValue: 'yourdockerhub/frontend', description: 'Frontend Image')
-        string(name: 'FRONTEND_TAG', defaultValue: 'latest', description: 'Frontend Tag')
+        string(name: 'FRONTEND_IMAGE', defaultValue: ' ', description: 'Frontend Image')
+        string(name: 'FRONTEND_TAG', defaultValue: ' ', description: 'Frontend Tag')
 
-        // 🔹 Backend
-        string(name: 'BACKEND_IMAGE', defaultValue: 'yourdockerhub/backend', description: 'Backend Image')
-        string(name: 'BACKEND_TAG', defaultValue: 'latest', description: 'Backend Tag')
+        string(name: 'BACKEND_IMAGE', defaultValue: ' ', description: 'Backend Image')
+        string(name: 'BACKEND_TAG', defaultValue: ' ', description: 'Backend Tag')
 
-        // 🔹 Remote
-        string(name: 'REMOTE_HOST', defaultValue: '192.168.1.10', description: 'Remote Server IP')
-        string(name: 'REMOTE_USER', defaultValue: 'test2', description: 'Remote Username')
-        string(name: 'REMOTE_DIR', defaultValue: '/home/test2/app', description: 'Deployment Directory')
+        string(name: 'REMOTE_HOST', defaultValue: ' ', description: 'Remote Server IP')
+        string(name: 'REMOTE_USER', defaultValue: ' ', description: 'Remote Username')
+        string(name: 'REMOTE_DIR', defaultValue: ' ', description: 'Deployment Directory')
     }
 
     stages {
 
-        // 🔹 1. Show Parameters
         stage('Fetch Parameters') {
             steps {
                 echo "Branch: ${params.BRANCH}"
@@ -31,22 +27,12 @@ pipeline {
             }
         }
 
-        // 🔹 2. Clone (avoid re-clone issue)
         stage('Clone Repository') {
             steps {
-                script {
-                    if (!fileExists('.git')) {
-                        git branch: "${params.BRANCH}", url: "https://github.com/fenilpanchal/todo.git"
-                    } else {
-                        sh "git fetch --all"
-                        sh "git checkout ${params.BRANCH}"
-                        sh "git pull origin ${params.BRANCH}"
-                    }
-                }
+                git branch: "${params.BRANCH}", url: "https://github.com/fenilpanchal/todo.git"
             }
         }
 
-        // 🔹 3. Build Images
         stage('Build Docker Images') {
             steps {
                 sh """
@@ -56,7 +42,6 @@ pipeline {
             }
         }
 
-        // 🔹 4. Push Images
         stage('Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: '77', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -70,7 +55,6 @@ pipeline {
             }
         }
 
-        // 🔹 5. Prepare Remote
         stage('Prepare Remote Server') {
             steps {
                 sh """
@@ -79,18 +63,21 @@ pipeline {
             }
         }
 
-        // 🔹 6. Transfer Files
         stage('Transfer Files') {
             steps {
                 sh """
-                scp docker-compose.yml ${params.REMOTE_USER}@${params.REMOTE_HOST}:${params.REMOTE_DIR}/
-                scp .env ${params.REMOTE_USER}@${params.REMOTE_HOST}:${params.REMOTE_DIR}/
-                scp -r database ${params.REMOTE_USER}@${params.REMOTE_HOST}:${params.REMOTE_DIR}/
+        	tar -czvf app.tar.gz docker-compose.yml .env database
+
+               	scp app.tar.gz ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/
+
+     		ssh ${REMOTE_USER}@${REMOTE_HOST} "
+        	cd ${REMOTE_DIR} &&
+      	        tar -xzvf app.tar.gz &&
+       		rm app.tar.gz
                 """
             }
         }
 
-        // 🔹 7. Deploy
         stage('Deploy Application') {
             steps {
                 sh """
@@ -101,8 +88,8 @@ pipeline {
                     docker pull ${params.BACKEND_IMAGE}:${params.BACKEND_TAG}
                   
 
-                    docker-compose down || true
-                    docker-compose up -d
+                    docker-compose up -d --build
+ 		    docker image prune -f 
                 '
                 """
             }
