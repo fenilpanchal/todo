@@ -35,7 +35,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git branch: "${params.BRANCH_NAME}",
+                git branch: "${params.BRANCH_NAME.split('/').last()}",
                     url: "https://github.com/fenilpanchal/todo.git"
             }
         }
