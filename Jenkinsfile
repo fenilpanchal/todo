@@ -39,7 +39,18 @@ pipeline {
                     url: "https://github.com/fenilpanchal/todo.git"
             }
         }
+        
+ 
 
+        stage('Set Tag') {
+	    steps {
+        	script {
+                    IMAGE_TAG = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+       		}
+   	    }
+	}
+
+ 
         stage('Build Docker Images') {
             steps {
                 sh """
