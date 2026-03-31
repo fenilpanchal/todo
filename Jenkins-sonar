@@ -2,28 +2,35 @@
 
 
 
-pipeline {
-    agent any
 
+pipeline {
+    agent { label 'docker' }
+
+    parameters {
+        gitParameter(
+            name: 'BRANCH_NAME',
+            type: 'PT_BRANCH',
+            defaultValue: 'main',
+            description: 'Select Git Branch',
+            branchFilter: '.*'
+        )
+       
+    }
+		
     environment {
         SONARQUBE = 'SonarQube'
     }
-
-    parameters {
-        string(name: 'FRONTEND_PORT', defaultValue: '', description: 'Frontend Port')
-        string(name: 'BACKEND_PORT', defaultValue: '', description: 'Backend Port')
-    }
-
+    
     stages {
 
-        stage('Show Ports') {
+        stage('Clone Repository') {
             steps {
-                echo "Frontend Port: ${params.FRONTEND_PORT}"
-                echo "Backend Port: ${params.BACKEND_PORT}"
+                git branch: "${params.BRANCH_NAME.split('/').last()}",
+                    url: "https://github.com/fenilpanchal/todo.git"
             }
         }
-							
-        stage('SonarQube Analysis') {
+        
+           stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
                     sh 'sonar-scanner'
@@ -31,18 +38,21 @@ pipeline {
             }
         }
 
-        stage('Quality Gate Check') {
+        stage('Quality Gate') {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
         }
-  
+
+        stage('Success Stage') {
+            steps {
+                echo "Code is CLEAN"
+            }
+        }         
     }
 }
-
-
 
 
 
