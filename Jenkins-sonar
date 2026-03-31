@@ -14,7 +14,7 @@ pipeline {
     }
 
     environment {
-        SONARQUBE = 'sonar_J'
+        SONARQUBE = 'SonarQube'
     }
 
     stages {
