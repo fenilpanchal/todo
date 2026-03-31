@@ -1,5 +1,7 @@
+
+
 pipeline {
-    agent { label 'docker' }
+    agent any
 
     parameters {
         gitParameter(
@@ -9,23 +11,22 @@ pipeline {
             description: 'Select Git Branch',
             branchFilter: '.*'
         )
-       
     }
-		
+
     environment {
-        SONARQUBE = 'sonar_J'
+        SONARQUBE = 'SonarQube'
     }
-    
+
     stages {
 
-        stage('Clone Repository') {
+        stage('Clone Code') {
             steps {
                 git branch: "${params.BRANCH_NAME.split('/').last()}",
-                    url: "https://github.com/fenilpanchal/todo.git"
+                    url: 'https://github.com/fenilpanchal/todo.git'
             }
         }
-        
-           stage('SonarQube Scan') {
+
+        stage('Sonar Scan') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
                     sh 'sonar-scanner'
@@ -41,14 +42,11 @@ pipeline {
             }
         }
 
-        stage('Success Stage') {
+        stage('Deploy') {
             steps {
-                echo "Code is CLEAN"
+                echo "Code Passed Quality Gate"
             }
-        }         
+        }
     }
 }
-
-
-
 
