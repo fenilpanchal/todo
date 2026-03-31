@@ -33,7 +33,7 @@ pipeline {
            stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
-                    sh 'sonar-scanner'
+                    sh '/home/test/Desktop/sonar123/bin/sonar-scanner'
                 }
             }
         }
