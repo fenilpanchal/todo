@@ -13,7 +13,7 @@ pipeline {
     }
 		
     environment {
-        SONARQUBE = 'example'
+        SONARQUBE = 'sonar_J'
     }
     
     stages {
@@ -28,7 +28,7 @@ pipeline {
            stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
-                    sh '/home/test/Desktop/sonar123/bin/sonar-scanner'
+                    sh 'sonar-scanner'
                 }
             }
         }
