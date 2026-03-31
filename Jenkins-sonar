@@ -1,5 +1,7 @@
 
 
+
+
 pipeline {
     agent any
 
@@ -7,15 +9,21 @@ pipeline {
         SONARQUBE = 'SonarQube'
     }
 
+    parameters {
+        string(name: 'FRONTEND_PORT', defaultValue: '', description: 'Frontend Port')
+        string(name: 'BACKEND_PORT', defaultValue: '', description: 'Backend Port')
+    }
+
     stages {
 
-        stage('Clone Code') {
+        stage('Show Ports') {
             steps {
-                git 'https://github.com/fenilpanchal/todo.git'
+                echo "Frontend Port: ${params.FRONTEND_PORT}"
+                echo "Backend Port: ${params.BACKEND_PORT}"
             }
         }
-
-        stage('SonarQube Scan') {
+							
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
                     sh 'sonar-scanner'
@@ -23,21 +31,19 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
+        stage('Quality Gate Check') {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
         }
-
-        stage('Success Stage') {
-            steps {
-                echo "Code is CLEAN "
-            }
-        }
+  
     }
 }
+
+
+
 
 
 
