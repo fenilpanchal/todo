@@ -3,12 +3,6 @@
 pipeline {
     agent any
 		
-     parameters {
-        string(name: 'REMOTE_USER', defaultValue: '', description: 'VM Username')
-        string(name: 'REMOTE_IP', defaultValue: '', description: 'VM IP Address')
-        string(name: 'REMOTE_DIR', defaultValue: '', description: 'Deployment Path')
-    }
-    
     environment {
        	FRONTEND_IMAGE = "123fenil/todo-app-frontend"
     	BACKEND_IMAGE  = "123fenil/todo-app-backend"
@@ -36,7 +30,7 @@ pipeline {
         stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
-                     sh '/home/test/opt/sonar-scanner/bin/sonar-scanner'
+                     sh '/opt/sonar-scanner/bin/sonar-scanner'
                 }
             }
         }
@@ -87,10 +81,10 @@ pipeline {
                 sh """
                 tar -czvf app.tar.gz docker-compose.yml .env database
 
-                scp app.tar.gz ${params.REMOTE_USER}@${params.REMOTE_IP}:${params.REMOTE_DIR}/
+                scp app.tar.gz zymr@20.20.1.166 /home/zymr/jenkins/todo-app
 
-                ssh ${params.REMOTE_USER}@${params.REMOTE_IP} "
-                    cd ${params.REMOTE_DIR} &&
+                ssh zymr@20.20.1.166 "
+                    cd /home/zymr/jenkins/todo-app &&
                     tar -xzvf app.tar.gz &&
                     rm app.tar.gz
                 "
@@ -102,8 +96,8 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sh """
-                ssh ${params.REMOTE_USER}@${params.REMOTE_IP} "
-                    cd ${params.REMOTE_DIR} &&
+                ssh zymr@20.20.1.166 "
+                    cd /home/zymr/jenkins/todo-app &&
                     
                     IMAGE_TAG=${IMAGE_TAG} docker compose down &&
                     IMAGE_TAG=${IMAGE_TAG} docker compose up -d
