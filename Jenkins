@@ -76,35 +76,6 @@ pipeline {
         }
         
         
-         stage('Transfer Files') {
-            steps {
-                sh """
-                tar -czvf app.tar.gz docker-compose.yml .env database
-
-                scp app.tar.gz zymr@20.20.1.166 /home/zymr/jenkins/todo-app
-
-                ssh zymr@20.20.1.166 "
-                    cd /home/zymr/jenkins/todo-app &&
-                    tar -xzvf app.tar.gz &&
-                    rm app.tar.gz
-                "
-                """
-            }
-        }
-
-       
-        stage('Deploy Application') {
-            steps {
-                sh """
-                ssh zymr@20.20.1.166 "
-                    cd /home/zymr/jenkins/todo-app &&
-                    
-                    IMAGE_TAG=${IMAGE_TAG} docker compose down &&
-                    IMAGE_TAG=${IMAGE_TAG} docker compose up -d
-                "
-                """
-            }
-        }
     } 
 }
 
