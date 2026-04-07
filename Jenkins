@@ -1,7 +1,7 @@
 
 
 pipeline {
-    agent any
+    agent { label 'linux' }
 		
     environment {
        	FRONTEND_IMAGE = "123fenil/todo-app-frontend"
@@ -30,7 +30,7 @@ pipeline {
         stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv("${SONARQUBE}") {
-                     sh 'sonar-scanner'
+                     sh '/opt/sonra-scanner/bin/sonar-scanner'
                 }
             }
         }
