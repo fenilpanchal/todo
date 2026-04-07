@@ -2,7 +2,11 @@
 
 pipeline {
     agent { label 'linux' }
-		
+	
+    
+    tools{
+	sonarScanner 'sonar-J'
+    }			
     environment {
        	FRONTEND_IMAGE = "123fenil/todo-app-frontend"
     	BACKEND_IMAGE  = "123fenil/todo-app-backend"
@@ -25,11 +29,15 @@ pipeline {
                 }
             }
         }
+        
 
+        
         stage('SonarQube Scan') {
             steps {
                 withSonarQubeEnv("sonar-J") {
-                     sh 'sonar-scanner'
+                     sh """
+			${tool 'sonarScanner'}/bin/sonar-scanner
+		     """		
                 }
             }
         }
