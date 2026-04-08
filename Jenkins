@@ -1,17 +1,13 @@
 
 
+
+
 pipeline {
-    agent { label 'linux' }
-	
-    
-    tools{
-	sonarScanner 'sonar-J'
-    }			
+    agent any
+		
     environment {
-       	FRONTEND_IMAGE = "123fenil/todo-app-frontend"
-    	BACKEND_IMAGE  = "123fenil/todo-app-backend"
         
-        DOCKER_CREDENTIALS_ID = "77"
+        SONARQUBE = "sonar-J"
     }
 
     stages {
@@ -25,19 +21,18 @@ pipeline {
         stage('Set Tag') {
             steps {
                 script {
-                    IMAGE_TAG = sh(script: "git rev-parse --short HEAD",returnStdout: true).trim()
+                    IMAGE_TAG = sh(
+                        script: "git rev-parse --short HEAD",
+                        returnStdout: true
+                    ).trim()
                 }
             }
         }
-        
 
-        
         stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv("sonar-J") {
-                     sh """
-			${tool 'sonarScanner'}/bin/sonar-scanner
-		     """		
+                withSonarQubeEnv("${SONARQUBE}") {
+                    sh '/opt/sonar-scanner/bin/sonar-scanner'
                 }
             }
         }
@@ -49,68 +44,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                sh """
-		    docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend
-                    docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend                 
-                """
-            }
-        }
-
-        stage('Tag Docker Image') {
-            steps {
-                sh """
-                    docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${FRONTEND_IMAGE}:latest
-                    docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${BACKEND_IMAGE}:latest
-                """
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            steps {
-                withDockerRegistry(
-                    credentialsId: "${DOCKER_CREDENTIALS_ID}",url: '') {
-                    sh """
-                        docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
-                        docker push ${FRONTEND_IMAGE}:latest
-                        docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
-                        docker push ${BACKEND_IMAGE}:latest
-                    """
-                }
-            }
-        }
-        
-        stage('Transfer Files') {
-            steps {
-                sh """
-                tar -czvf app.tar.gz docker-compose.yml .env database
-
-                scp app.tar.gz zymr@20.20.1.166 /home/zymr/jenkins/todo-app
-
-                ssh zymr@20.20.1.166 "
-                    cd /home/zymr/jenkins/todo-app &&
-                    tar -xzvf app.tar.gz &&
-                    rm app.tar.gz
-                "
-                """
-            }
-        }
-
-       
-        stage('Deploy Application') {
-            steps {
-                sh """
-                ssh zymr@20.20.1.166 "
-                    cd /home/zymr/jenkins/todo-app &&
-                    
-                    IMAGE_TAG=${IMAGE_TAG} docker compose down &&
-                    IMAGE_TAG=${IMAGE_TAG} docker compose up -d
-                "
-                """
-            }
-        } 
-    } 
-}
+    }
+}	
 
