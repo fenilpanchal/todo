@@ -1,6 +1,6 @@
 
 pipeline {
-    agent { lable 'linux' }
+    agent { label 'linux' }
 		
     environment {
        	FRONTEND_IMAGE = "123fenil/todo-app-frontend"
