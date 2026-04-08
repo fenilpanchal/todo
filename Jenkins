@@ -4,7 +4,7 @@ pipeline {
 		
     environment {
        	FRONTEND_IMAGE = "123fenil/todo-app-frontend"
-    	  BACKEND_IMAGE  = "123fenil/todo-app-backend"
+        BACKEND_IMAGE = "123fenil/todo-app-backend"
         
         DOCKER_CREDENTIALS_ID = "77"
         SONARQUBE = "sonar-J"
@@ -60,20 +60,22 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
-            steps {
-                withDockerRegistry(
-                    credentialsId: "${DOCKER_CREDENTIALS_ID}",url: '') {
-                    sh """
-                        docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
-                        docker push ${FRONTEND_IMAGE}:latest
-                        docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
-                        docker push ${BACKEND_IMAGE}:latest
-                    """
-                }
-            }
-        }
         
+
+	stage('Push to Docker Hub') {
+	    steps {
+	        withCredentials([usernamePassword(credentialsId: '77',usernameVariable: 'DOCKER_USER',passwordVariable: 'DOCKER_PASS')]) {
+	            sh """
+	                echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+
+	                docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+	                docker push ${FRONTEND_IMAGE}:latest
+	                docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+	                docker push ${BACKEND_IMAGE}:latest
+	            """
+	        }
+	    }
+	}
         
         stage('Transfer Files') {
             steps {
