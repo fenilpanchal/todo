@@ -25,7 +25,7 @@ services:
       retries: 5
 
   backend:
-    image: 123fenil/todo-app-backend:$IMAGE_TAG
+    image: 123fenil/todo-app-backend:latest
       # build: ./backend
     container_name: todo-backend-1
     restart: always
@@ -45,7 +45,7 @@ services:
         condition: service_healthy
 
     networks:
-      - todo-network-2
+      - todo-network-1
 
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://20.20.2.72:5000/health"]
@@ -54,7 +54,7 @@ services:
       retries: 3
 
   frontend:
-    image: 123fenil/todo-app-frontend:$IMAGE_TAG
+    image: 123fenil/todo-app-frontend:latest
       # build: ./frontend
     container_name: todo-frontend-1
     restart: always
