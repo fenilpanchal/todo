@@ -82,9 +82,9 @@ pipeline {
                 sh """
                 tar -czvf app.tar.gz docker-compose.yml .env database
 
-                scp app.tar.gz zymr@20.20.1.166:/home/zymr/jenkins/todo-app
+                scp app.tar.gz zymr@20.20.2.72:/home/zymr/jenkins/todo-app
 
-                ssh zymr@20.20.1.166 "
+                ssh zymr@20.20.2.72 "
                     cd /home/zymr/jenkins/todo-app &&
                     tar -xzvf app.tar.gz &&
                     rm app.tar.gz
@@ -97,7 +97,7 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sh """
-                ssh zymr@20.20.1.166 "
+                ssh zymr@20.20.2.72 "
                     cd /home/zymr/jenkins/todo-app &&
                     
                     IMAGE_TAG=${IMAGE_TAG} docker-compose down &&
