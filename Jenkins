@@ -51,16 +51,6 @@ pipeline {
             }
         }
 
-        stage('Tag Docker Image') {
-            steps {
-                sh """
-                    docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${FRONTEND_IMAGE}:latest
-                    docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${BACKEND_IMAGE}:latest
-                """
-            }
-        }
-
-        
 
 	stage('Push to Docker Hub') {
 	    steps {
@@ -69,9 +59,7 @@ pipeline {
 	                echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 	
 			docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
-	                docker push ${FRONTEND_IMAGE}:latest
 	                docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
-	                docker push ${BACKEND_IMAGE}:latest	
 	            """
 	        }
 	    }
